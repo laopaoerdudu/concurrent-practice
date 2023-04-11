@@ -10,7 +10,7 @@ class ThreadLocalTest {
 
     @Test
     fun test() {
-        for(i in 0 until 1000) {
+        for (i in 0 until 1000) {
             threadPool.submit {
                 println(this@ThreadLocalTest.date(i))
             }
