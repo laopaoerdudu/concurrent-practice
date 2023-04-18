@@ -1,8 +1,11 @@
 package com.wwe
 
+import com.wwe.atomic.AtomicTask
+import com.wwe.atomic.SynchronizedTask
 import com.wwe.atomic.Task
 import org.junit.Test
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 class AtomicTest {
@@ -19,5 +22,41 @@ class AtomicTest {
         Thread.sleep(200)
         println(counter.get())
         threadPool.shutdown()
+    }
+
+    @Test
+    fun test1() {
+        // GIVEN
+        val atomicInteger = AtomicInteger()
+        val runnable = AtomicTask(atomicInteger)
+        val thread1 = Thread(runnable)
+        val thread2 = Thread(runnable)
+
+        // WHEN
+        thread1.start()
+        thread2.start()
+        thread1.join()
+        thread2.join()
+
+        // THEN
+        assert(2000 == atomicInteger.get())
+    }
+
+    @Test
+    fun test2() {
+        // GIVEN
+        var value = 0
+        val runnable = SynchronizedTask(value)
+        val thread1 = Thread(runnable)
+        val thread2 = Thread(runnable)
+
+        // WHEN
+        thread1.start()
+        thread2.start()
+        thread1.join()
+        thread2.join()
+
+        // THEN
+        println("value: $value")
     }
 }
