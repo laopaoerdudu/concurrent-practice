@@ -3,29 +3,25 @@ package com.wwe
 import org.junit.Test
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
-class ReadWriteLockTest {
-
-//    @Rule
-//    @JvmField
-//    var rule: TestRule = InstantTaskExecutorRule()
+class ReadLockJumpQueueTest {
 
     @Test
     fun test() {
-        Thread {
+        Thread({
             read()
-        }.start()
-        Thread {
+        }, "Thread-2").start()
+        Thread({
             read()
-        }.start()
+        }, "Thread-4").start()
 
-        Thread {
+        Thread({
             write()
-        }.start()
-        Thread {
-            write()
-        }.start()
+        }, "Thread-3").start() // ReentrantReadWriteLock 的实现选择了“不允许插队”的策略，这就大大减小了发生“饥饿”的概率。
+        Thread({
+            read()
+        }, "Thread-5").start()
 
-        Thread.sleep(3_000)
+        Thread.sleep(10_000)
     }
 
     private fun read() {
@@ -33,7 +29,7 @@ class ReadWriteLockTest {
 
         try {
             println("${Thread.currentThread().name} got read lock, reading...")
-            Thread.sleep(500)
+            Thread.sleep(2_000)
         } catch (ex: InterruptedException) {
             ex.printStackTrace()
         } finally {
@@ -47,7 +43,7 @@ class ReadWriteLockTest {
 
         try {
             println("${Thread.currentThread().name} got write lock, writing...")
-            Thread.sleep(500)
+            Thread.sleep(2_000)
         } catch (ex: InterruptedException) {
             ex.printStackTrace()
         } finally {
@@ -59,7 +55,7 @@ class ReadWriteLockTest {
     companion object {
 
         @JvmStatic
-        private val reentrantReadWriteLock = ReentrantReadWriteLock(false)
+        private val reentrantReadWriteLock = ReentrantReadWriteLock()
 
         @JvmStatic
         private val readLock: ReentrantReadWriteLock.ReadLock = reentrantReadWriteLock.readLock()
