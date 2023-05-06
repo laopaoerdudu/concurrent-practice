@@ -25,10 +25,11 @@ class CountDownLatchTest {
             }
         }
         println("主线程开始等待。")
-        latch.await()
+        latch.await() // 主线程在其他线程都准备完毕之后再继续执行
         println("比赛结束。")
     }
 
+    /** 多个线程等待某一个线程的信号，同时开始执行 */
     @Test
     fun test2() {
         val countDownLatch = CountDownLatch(1)
@@ -44,8 +45,8 @@ class CountDownLatchTest {
                 }
             }
         }
-        Thread.sleep(2_000)
-        countDownLatch.countDown()
+        Thread.sleep(5_000)
         println("发令枪响，比赛开始！")
+        countDownLatch.countDown()
     }
 }
